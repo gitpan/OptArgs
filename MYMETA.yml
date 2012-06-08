@@ -1,0 +1,28 @@
+---
+abstract: 'integrated argument and option processing for Perl'
+author:
+  - 'Mark Lawrence <nomad@null.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::Fatal: 0
+  Test::More: 0
+  Test::Output: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: OptArgs
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Exporter::Tidy: 0
+  Getopt::Long: 2.37
+  Scalar::Util: 0
+version: v0.0.1_1

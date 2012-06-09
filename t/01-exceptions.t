@@ -115,9 +115,28 @@ like exception {
         isa      => 'Str',
         comment  => 'comment',
         required => 1,
-        default  => 1
+        default  => 1,
     );
 }, qr/cannot be used together/, 'clash';
+
+like exception {
+    arg fallback => (
+        isa      => 'Str',
+        comment  => 'comment',
+        fallback => {
+            name    => 'other',
+            comment => 'comment',
+        },
+    );
+}, qr/only valid with isa/, 'fallback';
+
+like exception {
+    arg fallback => (
+        isa      => 'SubCmd',
+        comment  => 'comment',
+        fallback => 1,
+    );
+}, qr/must be a hashref/, 'fallback hashref';
 
 arg astr => ( isa => 'Str', comment => 'comment', required => 1 );
 

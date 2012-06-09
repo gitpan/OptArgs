@@ -130,10 +130,18 @@ DESCRIPTION
             source has finished. The value to be set must be returned, and
             any changes to the hashref are ignored.
 
-    Note that any call to opt() or arg() causes the next call to opts(),
-    args() or optargs() (described below) to reset their values and reparse
-    @ARGV, so you probably want to define all your options and arguments
-    before retrieving their values.
+        greedy
+            If true the argument swallows the rest of the command line. It
+            doesn't make sense to define any more arguments once you have
+            used this as they will never be seen.
+
+        fallback
+            If "isa" is a "SubCmd" this option (when set) will stop the
+            generation of the usage message when the argument is not found
+            as a sub-command. The current command will be called instead.
+            This option when set must be a HASH reference containing "name"
+            and "comment" key/value pairs, which are only used in usage
+            messages.
 
   Parsing and Retrieving Values
     OptArgs exports the following functions for parsing and retriving option
@@ -146,9 +154,9 @@ DESCRIPTION
         options and arguments is given.
 
   Utility Functions
-    usage() -> Str
-        Returns a usage string based on the defined opts and args. Can be
-        called at any time.
+    usage([$message]) -> Str
+        Returns a usage string based on the defined opts and args, prefixed
+        with $message if given.
 
   Writing Sub-Commands
     OptArgs exports the following functions for defining and running
@@ -161,12 +169,12 @@ DESCRIPTION
         TBD.
 
 SEE ALSO
-    Getopt::Long
+    Getopt::Long, Exporter::Tidy
 
 SUPPORT & DEVELOPMENT
     This distribution is managed via github:
 
-        http://github.com/mlawren/optargs
+        http://github.com/mlawren/p5-OptArgs
 
     This distribution follows the semantic versioning model:
 

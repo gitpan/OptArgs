@@ -1,20 +1,21 @@
 package OptArgs;
 use strict;
 use warnings;
-use Carp qw/croak/;
+use Carp qw/croak carp/;
 use Exporter::Tidy
-  default => [qw/opt arg opts args optargs usage subcmd/],
+  default => [qw/opt arg optargs usage subcmd/],
   other   => [qw/dispatch/];
 use Getopt::Long qw/GetOptionsFromArray/;
 use List::Util qw/max/;
 
 our $VERSION = '0.0.1';
 
-my %seen;      # hash of hashes keyed by 'caller', then opt/arg name
-my %opts;      # option configuration keyed by 'caller'
-my %args;      # argument configuration keyed by 'caller'
-my %caller;    # current 'caller' keyed by real caller
-my %desc;      # sub-command descriptions
+my %seen;           # hash of hashes keyed by 'caller', then opt/arg name
+my %opts;           # option configuration keyed by 'caller'
+my %args;           # argument configuration keyed by 'caller'
+my %caller;         # current 'caller' keyed by real caller
+my %desc;           # sub-command descriptions
+my %dispatching;    # track optargs() calls from dispatch classes
 
 # internal method for App::optargs
 sub _cmdlist {
@@ -26,6 +27,10 @@ sub _cmdlist {
         my @subcmd =
           map { exists $_->{subcommands} ? $_->{subcommands} : () }
           @{ $args{$package} };
+
+        push( @subcmd,
+            map { exists $_->{fallback} ? [ uc $_->{fallback}->{name} ] : () }
+              @{ $args{$package} } );
 
         foreach my $subcmd ( map { @$_ } @subcmd ) {
             push( @list, _cmdlist( $package . '::' . $subcmd ) );
@@ -60,7 +65,7 @@ sub subcmd {
     $opts{$package}  = [];
     $args{$package}  = [];
 
-    my $parent_arg = ( grep { $_->{type} eq 'subcmd' } @{ $args{$parent} } )[0];
+    my $parent_arg = ( grep { $_->{isa} eq 'SubCmd' } @{ $args{$parent} } )[0];
     push( @{ $parent_arg->{subcommands} }, $name );
 
     return;
@@ -144,6 +149,8 @@ my %arg_params = (
     comment  => undef,
     required => undef,
     default  => undef,
+    greedy   => undef,
+    fallback => undef,
 );
 
 my @arg_required = (qw/isa comment/);
@@ -181,17 +188,29 @@ sub arg {
     croak "'default' and 'required' cannot be used together"
       if defined $params->{default} and defined $params->{required};
 
+    croak "'fallback' only valid with isa 'SubCmd'"
+      if $params->{fallback} and $params->{isa} ne 'SubCmd';
+
+    croak "fallback must be a hashref"
+      if defined $params->{fallback} && ref $params->{fallback} ne 'HASH';
+
     $params->{package} = $package;
     $params->{name}    = $name;
     $params->{length}  = length $name;
     $params->{acount}  = 0;
     $params->{type}    = 'arg';
-    $params->{type}    = 'subcmd' if $params->{isa} eq 'SubCmd';
     $params->{ISA}     = $params->{name} . $arg_isa{ $params->{isa} };
 
     push( @{ $args{$package} }, $params );
     $opts{$package} ||= [];
     $seen{$package}->{$name}++;
+
+    if ( $params->{fallback} ) {
+        my $p = $package . '::' . uc $params->{fallback}->{name};
+        $p =~ s/-/_/;
+        $opts{$p} = [];
+        $args{$p} = [];
+    }
 
     return;
 }
@@ -214,15 +233,17 @@ sub _usage {
         $usage .= ' ' if $usage;
         $usage .= '[' unless $def->{required};
         $usage .= uc $def->{name};
+        $usage .= '...' if $def->{greedy};
         $usage .= ']' unless $def->{required};
 
         $length_a = max( $length_a, map { length $_ } @{ $def->{subcommands} } )
-          if $def->{type} eq 'subcmd';
+          if $def->{isa} eq 'SubCmd';
     }
 
     while ( $parent =~ s/(.*)::(.*)/$1/ ) {
         last unless $seen{$parent};
-        $usage = $2 . ' ' . $usage;
+        ( my $name = $2 ) =~ s/_/-/g;
+        $usage = $name . ' ' . $usage;
         unshift( @config, @{ $opts{$parent} } );
     }
 
@@ -244,6 +265,18 @@ sub _usage {
 
         if ( $def->{type} eq 'arg' ) {
             $usage .= sprintf( $format_a, uc $def->{name}, $def->{comment} );
+            foreach my $subcommand ( @{ $def->{subcommands} } ) {
+                my $pkg = $def->{package} . '::' . $subcommand;
+                $pkg =~ s/-/_/g;
+                my $desc = $desc{$pkg};
+                $usage .= sprintf( $format_a, '    ' . $subcommand, $desc );
+            }
+
+            if ( $def->{fallback} ) {
+                $usage .= sprintf( $format_a,
+                    '    ' . uc $def->{fallback}->{name},
+                    $def->{fallback}->{comment} );
+            }
         }
         elsif ( $def->{type} eq 'opt' ) {
             my $opt = '--' . $def->{name};
@@ -253,15 +286,6 @@ sub _usage {
                 $opt, $def->{alias} ? '-' . $def->{alias} : '' );
 
             $usage .= sprintf( $format_a, $tmp, $def->{comment} );
-        }
-        elsif ( $def->{type} eq 'subcmd' ) {
-            $usage .= sprintf( $format_a, uc $def->{name}, $def->{comment} );
-            foreach my $subcommand ( @{ $def->{subcommands} } ) {
-                my $pkg = $def->{package} . '::' . $subcommand;
-                $pkg =~ s/-/_/g;
-                my $desc = $desc{$pkg};
-                $usage .= sprintf( $format_a, '    ' . $subcommand, $desc );
-            }
         }
     }
 
@@ -273,7 +297,7 @@ sub _usage {
 
 sub usage {
     my $caller = caller;
-    return _usage($caller);
+    return _usage( $caller, @_ );
 }
 
 # ------------------------------------------------------------------------
@@ -302,9 +326,15 @@ sub _optargs {
         if ( $try->{type} eq 'opt' ) {
             GetOptionsFromArray( $source, $try->{ISA} => \$result );
         }
-        elsif ( $try->{type} eq 'arg' or $try->{type} eq 'subcmd' ) {
+        elsif ( $try->{type} eq 'arg' ) {
             if (@$source) {
-                $result = shift @$source;
+                if ( $try->{greedy} ) {
+                    $result = "@$source";
+                    shift @$source while @$source;
+                }
+                else {
+                    $result = shift @$source;
+                }
 
                 # TODO: type check using Param::Utils?
             }
@@ -317,16 +347,17 @@ sub _optargs {
                 die _usage( $package, "unknown option: " . $result )
                   if ( $result =~ m/^-/ );
 
-                my $oldpackage = $package;
-                $package = $package . '::' . $result;
-                $package =~ s/-/_/;
+                my $newpackage = $package . '::' . $result;
+                $newpackage =~ s/-/_/;
 
-                die _usage( $oldpackage,
-                    "unknown " . uc( $try->{name} ) . ': ' . $result )
-                  unless exists $seen{$package};
-
-                push( @config, @{ $opts{$package} }, @{ $args{$package} } );
-
+                if ( exists $seen{$newpackage} ) {
+                    $package = $newpackage;
+                    push( @config, @{ $opts{$package} }, @{ $args{$package} } );
+                }
+                elsif ( !$try->{fallback} ) {
+                    die _usage( $package,
+                        "unknown " . uc( $try->{name} ) . ': ' . $result );
+                }
             }
 
         }
@@ -363,6 +394,10 @@ sub _optargs {
 
 sub optargs {
     my $caller = caller;
+
+    carp "optargs() called from dispatch handler"
+      if $dispatching{$caller};
+
     my ( $package, $optargs ) = _optargs( $caller, @_ );
     return $optargs;
 }
@@ -384,7 +419,11 @@ sub dispatch {
 
     die "Can't find method $method via package $package" unless $sub;
 
-    return $sub->($optargs);
+    $dispatching{$class}++;
+    my @results = $sub->($optargs);
+    $dispatching{$class}--;
+    return @results if wantarray;
+    return $results[0];
 }
 
 1;

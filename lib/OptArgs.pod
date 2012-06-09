@@ -163,14 +163,23 @@ containg all option/argument values after parsing the source has
 finished.  The value to be set must be returned, and any changes to the
 hashref are ignored.
 
-=back
+=item greedy
+
+If true the argument swallows the rest of the command line. It doesn't
+make sense to define any more arguments once you have used this as they
+will never be seen.
+
+=item fallback
+
+If C<isa> is a C<SubCmd> this option (when set) will stop the
+generation of the usage message when the argument is not found as a
+sub-command. The current command will be called instead. This option
+when set must be a HASH reference containing "name" and "comment"
+key/value pairs, which are only used in usage messages.
 
 =back
 
-Note that any call to opt() or arg() causes the next call to opts(),
-args() or optargs() (described below) to reset their values and reparse
-@ARGV, so you probably want to define all your options and arguments
-before retrieving their values.
+=back
 
 =head2 Parsing and Retrieving Values
 
@@ -192,10 +201,10 @@ and arguments is given.
 
 =over
 
-=item usage() -> Str
+=item usage([$message]) -> Str
 
-Returns a usage string based on the defined opts and args. Can be
-called at any time.
+Returns a usage string based on the defined opts and args, prefixed
+with $message if given.
 
 =back
 
@@ -218,14 +227,14 @@ TBD.
 
 =head1 SEE ALSO
 
-L<Getopt::Long>
+L<Getopt::Long>, L<Exporter::Tidy>
 
 =head1 SUPPORT & DEVELOPMENT
 
 
 This distribution is managed via github:
 
-    http://github.com/mlawren/optargs
+    http://github.com/mlawren/p5-OptArgs
 
 This distribution follows the semantic versioning model:
 

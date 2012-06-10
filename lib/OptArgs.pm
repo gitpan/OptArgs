@@ -271,12 +271,12 @@ sub _usage {
                 my $pkg = $def->{package} . '::' . $subcommand;
                 $pkg =~ s/-/_/g;
                 my $desc = $desc{$pkg};
-                $usage .= sprintf( $format_a, '    ' . $subcommand, $desc );
+                $usage .= sprintf( $format_a, '  ' . $subcommand, $desc );
             }
 
             if ( $def->{fallback} ) {
                 $usage .= sprintf( $format_a,
-                    '    ' . uc $def->{fallback}->{name},
+                    '  ' . uc $def->{fallback}->{name},
                     $def->{fallback}->{comment} );
             }
         }
@@ -310,10 +310,17 @@ sub _optargs {
     my $source  = \@_;
     my $package = $caller;
 
-    if ( !@_ ) {
+    if ( !@_ and @ARGV ) {
         my $codeset = eval { langinfo( I18N::Langinfo::CODESET() ) };
-        @ARGV = map { Encode::is_utf8($_) ? $_ : decode $codeset, $_ } @ARGV
-          unless $@;
+        if ( !$@ ) {
+            @ARGV =
+              map { Encode::is_utf8($_) ? $_ : decode( $codeset, $_ ) } @ARGV;
+        }
+        else {
+
+            # our best attempt?
+            @ARGV = map { Encode::is_utf8($_) ? $_ : decode_utf8($_) } @ARGV;
+        }
         $source = \@ARGV;
     }
 

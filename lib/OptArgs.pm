@@ -2,7 +2,7 @@ package OptArgs;
 use strict;
 use warnings;
 use Carp qw/croak carp/;
-use Encode qw/decode/;
+use Encode qw/decode decode_utf8/;
 use Exporter::Tidy
   default => [qw/opt arg optargs usage subcmd/],
   other   => [qw/dispatch/];
@@ -311,6 +311,8 @@ sub _optargs {
     my $package = $caller;
 
     if ( !@_ and @ARGV ) {
+        use Data::Dumper;
+        warn Dumper(\@ARGV, [ map {Encode::is_utf8($_)} @ARGV]);
         my $codeset = eval { langinfo( I18N::Langinfo::CODESET() ) };
         if ( !$@ ) {
             @ARGV =

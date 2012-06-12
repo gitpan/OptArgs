@@ -21,7 +21,7 @@
 #     NAME => q[OptArgs]
 #     NO_META => q[1]
 #     PREREQ_PM => { Getopt::Long=>q[2.37], Scalar::Util=>q[0], ExtUtils::MakeMaker=>q[6.36], Test::Fatal=>q[0], Exporter::Tidy=>q[0], Carp=>q[0], Encode=>q[0], Test::More=>q[0], I18N::Langinfo=>q[0], Test::Output=>q[0] }
-#     VERSION => q[0.0.1_9]
+#     VERSION => q[0.0.1_10]
 #     dist => {  }
 #     realclean => { FILES=>q[MYMETA.yml] }
 
@@ -62,11 +62,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = OptArgs
 NAME_SYM = OptArgs
-VERSION = 0.0.1_9
+VERSION = 0.0.1_10
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_0_1_9
+VERSION_SYM = 0_0_1_10
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.0.1_9
+XS_VERSION = 0.0.1_10
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -267,7 +267,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = OptArgs
-DISTVNAME = OptArgs-0.0.1_9
+DISTVNAME = OptArgs-0.0.1_10
 
 
 # --- MakeMaker macro section:
@@ -801,7 +801,7 @@ testdb_static :: testdb_dynamic
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="0.0.1_9">' > $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="0.0.1_10">' > $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>integrated argument and option processing for Perl</ABSTRACT>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Mark Lawrence &lt;nomad@null.net&gt;</AUTHOR>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> $(DISTNAME).ppd

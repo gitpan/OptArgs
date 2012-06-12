@@ -32,4 +32,4 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/mlawren/optargs
-version: 0.0.1_9
+version: 0.0.1_10

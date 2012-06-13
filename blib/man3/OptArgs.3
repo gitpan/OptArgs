@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "OptArgs 3"
-.TH OptArgs 3 "2012-06-10" "perl v5.12.1" "User Contributed Perl Documentation"
+.TH OptArgs 3 "2012-06-13" "perl v5.12.1" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -229,13 +229,17 @@ alias is desired. If the option name contains underscores ('_') then an
 alias with '\-' substitutions will be automatically added.
 .IP "ishelp" 4
 .IX Item "ishelp"
-When true flags this option as a help option, which when given will
-then result in an internal \*(L"die \fIusage()\fR\*(R" call. This is basically a
-shortcut saving you from doing the following in each (sub)command:
+When true flags this option as a help option, which when given on the
+command line results in a usage message printed to \fIstdout\fR followed
+by an exit with a status of 2.  This flag is basically a shortcut to
+save you from doing the following in each (sub) command:
 .Sp
-.Vb 2
+.Vb 5
 \&    my $opts = optargs;
-\&    die usage(\*(Aqhelp requested\*(Aq) if $opts\->{help};
+\&    if ( $opts\->{help} ) {
+\&        print usage(\*(Aqhelp requested\*(Aq);
+\&        exit 2;
+\&    }
 .Ve
 .RE
 .RS 4

@@ -319,6 +319,12 @@ sub _optargs {
             @ARGV =
               map { Encode::is_utf8($_) ? $_ : decode( $codeset, $_ ) } @ARGV;
         }
+        else {
+            for ( 0 .. $#ARGV ) {
+                my $utf8 = eval { decode_utf8( $ARGV[$_], Encode::FB_CROAK ) };
+                $ARGV[$_] = $utf8 unless $@;
+            }
+        }
 
         $source = \@ARGV;
     }
@@ -389,7 +395,8 @@ sub _optargs {
     }
 
     if ($ishelp) {
-        die _usage( $package, "[help request]" );
+        print _usage( $package, "[help request]" );
+        exit 2;
     }
     elsif ($missing_required) {
         die _usage($package);

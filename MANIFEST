@@ -1,11 +1,5 @@
 bin/optargs
 Changes
-debian/changelog
-debian/compat
-debian/control
-debian/copyright
-debian/rules
-debian/watch
 inc/Module/Install.pm
 inc/Module/Install/AuthorTests.pm
 inc/Module/Install/Base.pm

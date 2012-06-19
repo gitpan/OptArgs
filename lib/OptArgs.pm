@@ -319,30 +319,13 @@ sub _optargs {
             @ARGV =
               map { Encode::is_utf8($_) ? $_ : decode( $codeset, $_ ) } @ARGV;
         }
-        else {
-            for ( 0 .. $#ARGV ) {
-                binmode STDERR, ':encoding(UTF-8)';
-                use Data::Dumper;
 
-                warn 'OSNAME ' . $^O;
-                warn 'plain ' . $ARGV[$_];
-                warn Dumper( $ARGV[$_] );
-
-                warn 'encode ' . encode_utf8( $ARGV[$_] );
-                warn Dumper( encode_utf8( $ARGV[$_] ) );
-
-                warn 'decode ' . decode_utf8( $ARGV[$_] );
-                warn Dumper( decode_utf8( $ARGV[$_] ) );
-
-                warn 'decode.encode ' . decode_utf8( encode_utf8( $ARGV[$_] ) );
-                warn Dumper( decode_utf8( encode_utf8( $ARGV[$_] ) ) );
-
-                my $utf8 = eval {
-                    decode_utf8( encode_utf8( $ARGV[$_] ), Encode::FB_CROAK );
-                };
-                $ARGV[$_] = $utf8 unless $@;
-            }
-        }
+#        else {
+#            for ( 0 .. $#ARGV ) {
+#                my $utf8 = eval { decode_utf8( $ARGV[$_], Encode::FB_CROAK ); };
+#                $ARGV[$_] = $utf8 unless $@;
+#            }
+#        }
 
         $source = \@ARGV;
     }
@@ -368,11 +351,34 @@ sub _optargs {
         elsif ( $try->{type} eq 'arg' ) {
             if (@$source) {
                 if ( $try->{greedy} ) {
-                    $result = "@$source";
+                    my @later;
+                    if ( @config and @$source > @config ) {
+                        push( @later, pop @$source ) for @config;
+                    }
+
+                    if ( $try->{isa} eq 'ArrayRef' ) {
+                        $result = [@$source];
+                    }
+                    elsif ( $try->{isa} eq 'HashRef' ) {
+                        $result = { map { split /=/, $_ } @$source };
+                    }
+                    else {
+                        $result = "@$source";
+                    }
+
                     shift @$source while @$source;
+                    push( @$source, @later );
                 }
                 else {
-                    $result = shift @$source;
+                    if ( $try->{isa} eq 'ArrayRef' ) {
+                        $result = [ shift @$source ];
+                    }
+                    elsif ( $try->{isa} eq 'HashRef' ) {
+                        $result = { split /=/, shift @$source };
+                    }
+                    else {
+                        $result = shift @$source;
+                    }
                 }
 
                 # TODO: type check using Param::Utils?
@@ -413,8 +419,7 @@ sub _optargs {
     }
 
     if ($ishelp) {
-        print _usage( $package, "[help request]" );
-        exit 2;
+        die _usage( $package, "[help request]" );
     }
     elsif ($missing_required) {
         die _usage($package);

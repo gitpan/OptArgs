@@ -4,7 +4,7 @@
       "Mark Lawrence <nomad@null.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.112150",
    "license" : [
       "open_source"
    ],
@@ -24,10 +24,10 @@
       "build" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "6.36",
-            "Test::Fatal" : "0",
-            "Test::More" : "0",
-            "Test::Output" : "0",
-            "utf8::all" : "0"
+            "Test::Fatal" : 0,
+            "Test::More" : 0,
+            "Test::Output" : 0,
+            "utf8::all" : 0
          }
       },
       "configure" : {
@@ -37,12 +37,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
-            "Encode" : "0",
-            "Exporter::Tidy" : "0",
+            "Carp" : 0,
+            "Encode" : 0,
+            "Exporter::Tidy" : 0,
             "Getopt::Long" : "2.37",
-            "I18N::Langinfo" : "0",
-            "Scalar::Util" : "0"
+            "I18N::Langinfo" : 0,
+            "Scalar::Util" : 0
          }
       }
    },
@@ -55,5 +55,5 @@
          "url" : "https://github.com/mlawren/optargs"
       }
    },
-   "version" : "0.0.1_18"
+   "version" : "0.0.1_19"
 }

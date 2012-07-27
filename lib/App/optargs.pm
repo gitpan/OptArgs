@@ -5,13 +5,15 @@ use OptArgs;
 use lib 'lib';
 our $VERSION = '0.0.1';
 
+$OptArgs::COLOUR = 1;
+
 arg class => (
     isa      => 'Str',
     required => 1,
     comment  => 'OptArgs-based module to map',
 );
 
-arg command => (
+arg name => (
     isa     => 'Str',
     comment => 'Name of the command',
     default => sub { return shift->{class}; }
@@ -51,14 +53,15 @@ sub run {
         my $length = scalar split( /::/, $cmd ) - $initial;
         my $space = $indent x $length;
 
-        my $usage = OptArgs::_usage($cmd);
-        $usage =~ s/^usage: optargs/usage: $opts->{command}/;
-
         unless ( $opts->{full} ) {
-            $usage =~ m/usage: (.*?)$/m;
-            print $space . $1 . "\n";
+            my $usage = OptArgs::_synopsis($cmd);
+            $usage =~ s/^usage: \S+/$space$opts->{name}/;
+            print $usage;
             next;
         }
+
+        my $usage = OptArgs::_usage($cmd);
+        $usage =~ s/^usage: \S+/usage: $opts->{name}/;
 
         my $n = 79 - length $space;
         print $space, '#' x $n, "\n";
@@ -76,7 +79,7 @@ __END__
 
 =head1 NAME
 
-App::optargs - print an OptArgs program command summary
+App::optargs - implementation of the optargs(1) command
 
 =head1 VERSION
 
@@ -89,20 +92,8 @@ App::optargs - print an OptArgs program command summary
 
 =head1 DESCRIPTION
 
-This is the implementation of the L<optargs> command which has the
-following usage:
-
-    usage: optargs CLASS [COMMAND]
-
-        CLASS             OptArgs-based module to map
-        COMMAND           Name of the command
-
-        --indent, -i      Number of spaces to indent sub-commands
-        --spacer, -s      Character to use for indent spaces
-        --full,   -f      Print the full usage messages
-
-It has a single function which expects to be called by L<OptArgs>
-C<dispatch()>:
+This is the implementation of the L<optargs>(1) command. It contains a
+single function which expects to be called by  C<OptArgs::dispatch()>:
 
 =over
 
@@ -114,7 +105,7 @@ Run with options as defined by \%opts.
 
 =head1 SEE ALSO
 
-L<optargs>, L<OptArgs>
+L<OptArgs>
 
 =head1 AUTHOR
 

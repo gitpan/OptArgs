@@ -9,9 +9,9 @@ build_requires:
   Test::Output: 0
   utf8::all: 0
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
+  ExtUtils::MakeMaker: 0
 dynamic_config: 0
-generated_by: 'Module::Install version 1.06, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,9 +19,8 @@ meta-spec:
 name: OptArgs
 no_index:
   directory:
-    - inc
     - t
-    - xt
+    - inc
 requires:
   Carp: 0
   Encode: 0
@@ -29,7 +28,4 @@ requires:
   Getopt::Long: 2.37
   I18N::Langinfo: 0
   Scalar::Util: 0
-resources:
-  license: http://opensource.org/licenses/gpl-license.php
-  repository: https://github.com/mlawren/optargs
-version: 0.0.1_17
+version: v0.0.1_19

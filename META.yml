@@ -1,5 +1,5 @@
 ---
-abstract: 'integrated argument and option processing for Perl'
+abstract: 'integrated argument and option processing'
 author:
   - 'Mark Lawrence <nomad@null.net>'
 build_requires:
@@ -33,4 +33,4 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/mlawren/optargs
-version: 0.0.1_19
+version: 0.0.1_20

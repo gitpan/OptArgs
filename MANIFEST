@@ -30,8 +30,8 @@ t/06-default.t
 t/07-rest.t
 t/08-fallback.t
 t/09-utf8.t
-t/10-utf8.t
 t/41-subcommand.t
+t/42-optargs.t
 t/lib/app/multi.pm
 t/lib/app/multi/init.pm
 t/lib/app/multi/new.pm

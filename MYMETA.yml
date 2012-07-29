@@ -1,13 +1,13 @@
 ---
-abstract: 'integrated argument and option processing for Perl'
+abstract: 'integrated argument and option processing'
 author:
   - 'Mark Lawrence <nomad@null.net>'
 build_requires:
   ExtUtils::MakeMaker: 6.36
+  POSIX: 0
   Test::Fatal: 0
   Test::More: 0
   Test::Output: 0
-  utf8::all: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 dynamic_config: 0
@@ -19,6 +19,7 @@ meta-spec:
 name: OptArgs
 no_index:
   directory:
+    - example
     - inc
     - t
     - xt
@@ -32,4 +33,4 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/mlawren/optargs
-version: 0.0.1_19
+version: 0.0.1_20

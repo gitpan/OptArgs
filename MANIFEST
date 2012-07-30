@@ -13,6 +13,8 @@ inc/Module/Install/Scripts.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 lib/App/optargs.pm
+lib/Getopt/Args.pm
+lib/Getopt/Args.pod
 lib/OptArgs.pm
 lib/OptArgs.pod
 Makefile.PL

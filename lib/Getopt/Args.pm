@@ -1,4 +1,4 @@
-package OptArgs;
+package Getopt::Args;
 use strict;
 use warnings;
 use Carp qw/croak carp/;

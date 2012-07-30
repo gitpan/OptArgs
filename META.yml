@@ -30,8 +30,8 @@ requires:
   Exporter::Tidy: 0
   Getopt::Long: 2.37
   I18N::Langinfo: 0
-  Scalar::Util: 0
+  List::Util: 0
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/mlawren/optargs
-version: 0.0.1_21
+version: 0.0.1

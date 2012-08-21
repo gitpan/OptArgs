@@ -4,7 +4,7 @@ OptArgs - integrated argument and option processing
 
 =head1 VERSION
 
-0.0.3 (2012-08-04) development release.
+0.0.4 (2012-08-04) development release.
 
 =head1 SYNOPSIS
 
@@ -393,11 +393,16 @@ will never be seen.
 
 =item fallback
 
-If C<isa> is a C<SubCmd> this option (when set) will stop the
-generation of the usage message when the argument is not found as a
-sub-command. The current command will be called instead. This option
-when set must be a HASH reference containing "name" and "comment"
-key/value pairs, which are only used in usage messages.
+A hashref containing an argument definition for the event that a
+sub-command match is not found. This parameter is only valid when
+C<isa> is a C<SubCmd>. The hashref must contain "isa", "name" and
+"comment" key/value pairs, and may contain a "greedy" key/value pair.
+The Command Class "run" function will be called with the fallback
+argument integrated into the first argument like a regular sub-command.
+
+This is generally useful when you want to calculate a command alias
+from a configuration file at runtime, or otherwise run commands which
+don't easily fall into the OptArgs sub-command model.
 
 =back
 
@@ -446,6 +451,10 @@ you don't want cluttering up your normal usage message.
 
 Parse C<@ARGV> (or C<@argv> if given) and dispatch to C<$function> in
 the appropriate package name constructed from C<$rootclass>.
+
+As an aid for testing, if the passed in argument C<@argv> (not @ARGV)
+contains a HASH reference, the key/value combinations of the hash will
+be added as options. An undefined value means a boolean option.
 
 =back
 

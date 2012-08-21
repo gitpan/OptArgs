@@ -10,7 +10,7 @@ use Getopt::Long qw/GetOptionsFromArray/;
 use I18N::Langinfo qw/langinfo/;
 use List::Util qw/max/;
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 our $COLOUR  = 0;
 
 my %seen;           # hash of hashes keyed by 'caller', then opt/arg name
@@ -506,10 +506,20 @@ sub _optargs {
                     $package = $newpackage;
                     push( @config, @{ $opts{$package} }, @{ $args{$package} } );
                 }
-                elsif ( !$try->{fallback} and !$ishelp ) {
-                    die _usage( $package,
-                        "invalid " . $try->{name} . ': ' . $result );
+                elsif ( !$ishelp ) {
+                    if ( $try->{fallback} ) {
+                        unshift @$source, $result;
+                        $try->{fallback}->{type} = 'arg';
+                        push( @config, $try->{fallback} );
+                        next;
+                    }
+                    else {
+                        die _usage( $package,
+                            "invalid " . $try->{name} . ': ' . $result );
+                    }
                 }
+
+                $result = undef;
             }
 
         }
@@ -561,7 +571,27 @@ sub dispatch {
     croak 'dispatch($method, $class, [@argv])' unless $method and $class;
     croak $@ unless eval "require $class;1;";
 
-    my ( $package, $optargs ) = _optargs( $class, @_ );
+    my ( $package, $optargs );
+
+    if (@_) {
+        my @args;
+
+        foreach my $element (@_) {
+            if ( ref $element eq 'HASH' ) {
+                push( @args,
+                    '--' . $_, defined $element->{$_} ? $element->{$_} : () )
+                  for keys %$element;
+            }
+            else {
+                push( @args, $element );
+            }
+        }
+
+        ( $package, $optargs ) = _optargs( $class, @args );
+    }
+    else {
+        ( $package, $optargs ) = _optargs($class);
+    }
 
     my $sub = $package->can($method);
     if ( !$sub ) {

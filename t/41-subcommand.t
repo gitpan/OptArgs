@@ -38,4 +38,63 @@ usage: 41-subcommand.t init
 
 ', 'unexpected option';
 
+# abbreviations
+
+like exception { dispatch(qw/run app::multi in/) }, qr/error/,
+  'No abbreviation';
+
+$OptArgs::ABBREV++;
+
+stdout_is(
+    sub { dispatch(qw/run app::multi i/) },
+    'you are in init, thanks
+', 'abbrev i'
+);
+
+stdout_is(
+    sub { dispatch(qw/run app::multi ini/) },
+    'you are in init, thanks
+', 'abbrev ini'
+);
+
+stdout_is(
+    sub { dispatch(qw/run app::multi ne p/) },
+    'you are in new project, thanks
+', 'abbrev ne p'
+);
+
+# sorting
+
+$OptArgs::SORT = 0;
+
+is exception { dispatch(qw/run app::multi new -h/) }, '[help requested]
+
+usage:
+    41-subcommand.t new project   do the new project thing
+    41-subcommand.t new issue     create a new issue
+    41-subcommand.t new task      create a new task thread
+
+  options:
+    --help,    -h                 print a help message and exit
+    --dry-run, -n                 do nothing
+    --verbose, -v                 do it loudly
+
+', 'ordered';
+
+$OptArgs::SORT = 1;
+
+is exception { dispatch(qw/run app::multi new -h/) }, '[help requested]
+
+usage:
+    41-subcommand.t new issue     create a new issue
+    41-subcommand.t new project   do the new project thing
+    41-subcommand.t new task      create a new task thread
+
+  options:
+    --help,    -h                 print a help message and exit
+    --dry-run, -n                 do nothing
+    --verbose, -v                 do it loudly
+
+', 'sorted';
+
 done_testing();

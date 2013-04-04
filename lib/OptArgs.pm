@@ -10,8 +10,10 @@ use Getopt::Long qw/GetOptionsFromArray/;
 use I18N::Langinfo qw/langinfo/;
 use List::Util qw/max/;
 
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 our $COLOUR  = 0;
+our $ABBREV  = 0;
+our $SORT    = 0;
 
 my %seen;           # hash of hashes keyed by 'caller', then opt/arg name
 my %opts;           # option configuration keyed by 'caller'
@@ -288,7 +290,12 @@ sub _usage {
 
     if ( my $last = $args[$#args] ) {
         if ( $last->{isa} eq 'SubCmd' ) {
-            foreach my $subcommand ( @{ $last->{subcommands} } ) {
+            my @subcommands =
+              $SORT
+              ? sort @{ $last->{subcommands} }
+              : @{ $last->{subcommands} };
+
+            foreach my $subcommand (@subcommands) {
                 my $pkg = $last->{package} . '::' . $subcommand;
                 $pkg =~ s/-/_/g;
                 next if $hidden{$pkg} and !$ishelp;
@@ -458,7 +465,14 @@ sub _optargs {
         elsif ( $try->{type} eq 'arg' ) {
             if (@$source) {
                 die _usage( $package, "unknown option: " . $source->[0] )
-                  if ( $source->[0] =~ m/^(-\S)|(--\S+)$/ );
+                  if $source->[0] =~ m/^--\S/;
+
+                die _usage( $package, "unknown option: " . $source->[0] )
+                  if $source->[0] =~ m/^-\S/
+                  and !(
+                    $source->[0] =~ m/^-\d/ and ( $try->{isa} ne 'Num'
+                        or $try->{isa} ne 'Int' )
+                  );
 
                 if ( $try->{greedy} ) {
                     my @later;
@@ -499,6 +513,18 @@ sub _optargs {
             }
 
             if ( $try->{isa} eq 'SubCmd' and $result ) {
+
+                # look up abbreviated words
+                if ($ABBREV) {
+                    require Text::Abbrev;
+                    my %words =
+                      map { m/^$package\:\:(\w+)$/; $1 => 1 }
+                      grep { m/^$package\:\:(\w+)$/ }
+                      keys %seen;
+                    my %abbrev = Text::Abbrev::abbrev( keys %words );
+                    $result = $abbrev{$result} if defined $abbrev{$result};
+                }
+
                 my $newpackage = $package . '::' . $result;
                 $newpackage =~ s/-/_/;
 

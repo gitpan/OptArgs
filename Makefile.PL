@@ -1,7 +1,7 @@
 use inc::Module::Install;
 
 name 'OptArgs';
-version '0.0.4';
+version '0.0.5_1';
 all_from 'lib/OptArgs.pm';
 readme_from 'lib/OptArgs.pod';
 
@@ -21,6 +21,6 @@ author_tests 'xt';
 
 install_script 'bin/optargs';
 
-repository 'https://github.com/mlawren/optargs';
+repository 'https://github.com/mlawren/p5-OptArgs';
 
 WriteAll;

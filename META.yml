@@ -33,5 +33,5 @@ requires:
   List::Util: 0
 resources:
   license: http://opensource.org/licenses/gpl-license.php
-  repository: https://github.com/mlawren/optargs
-version: 0.0.4
+  repository: https://github.com/mlawren/p5-OptArgs
+version: 0.0.5_1

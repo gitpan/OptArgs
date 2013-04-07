@@ -4,6 +4,7 @@ author:
   - 'Mark Lawrence <nomad@null.net>'
 build_requires:
   ExtUtils::MakeMaker: 6.36
+  IO::Capture::Stdout: 0
   POSIX: 0
   Test::Fatal: 0
   Test::More: 0
@@ -31,7 +32,8 @@ requires:
   Getopt::Long: 2.37
   I18N::Langinfo: 0
   List::Util: 0
+  Text::Abbrev: 0
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/mlawren/p5-OptArgs
-version: 0.0.5_1
+version: 0.1.1_1

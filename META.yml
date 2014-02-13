@@ -27,6 +27,7 @@ no_index:
     - xt
   package:
     - OptArgs::Usage
+    - Getopt::Args::Usage
 requires:
   Carp: 0
   Encode: 0
@@ -38,4 +39,4 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/mlawren/p5-OptArgs
-version: 0.1.4
+version: 0.1.6

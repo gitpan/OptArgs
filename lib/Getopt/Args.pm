@@ -2,7 +2,7 @@ package Getopt::Args;
 use strict;
 use warnings;
 use Carp qw/croak carp/;
-use Encode qw/decode decode_utf8/;
+use Encode qw/decode/;
 use Exporter::Tidy
   default => [qw/opt arg optargs usage subcmd/],
   other   => [qw/dispatch/];
@@ -447,9 +447,6 @@ sub _optargs {
         if ($CODESET) {
             my $codeset = I18N::Langinfo::langinfo($CODESET);
             $_ = decode( $codeset, $_ ) for @ARGV;
-        }
-        elsif ( $^O ne 'MSWin32' ) {
-            $_ = decode( 'UTF-8', $_ ) for @ARGV;
         }
 
         $source = \@ARGV;
